@@ -20,6 +20,8 @@ public class Process {
     //节点列表
     private List<Logic> process;
 
+    private List<Activity> activityList = Activity.getList();
+
     //资源列表
     private List<Resource> resourceList;
 
@@ -33,6 +35,7 @@ public class Process {
 
         process = Lists.newArrayList();
         resourceList = Lists.newArrayList();
+        activityList = Lists.newArrayList();
 
         Activity activity = new Activity();
         Node node = new Node(activity);
@@ -158,8 +161,8 @@ public class Process {
             List<Logic> logicList = logic.getLogicList();
             interation(logicList);
         } else if (logic instanceof Or) {
-            List<Logic> logicList = logic.getLogicList();
-            interation(logicList);
+//            List<Logic> logicList = logic.getLogicList();
+//            interation(logicList);
         } else if (logic instanceof Interation) {
             //循环内部不能嵌套循环，防止实例过于复杂
             return;
@@ -196,23 +199,23 @@ public class Process {
             List<Logic> logicList = logic.getLogicList();
             and(logicList);
         } else if (logic instanceof Or) {
-            List<Logic> logicList = logic.getLogicList();
-            and(logicList);
+//            List<Logic> logicList = logic.getLogicList();
+//            and(logicList);
         } else if (logic instanceof Interation) {
-            Logic l = ((Interation) logic).getLogic();
-            if (l instanceof Node) {
-                And and = new And();
-                Node node1 = (Node) l;
-                Node node2 = new Node(new Activity(l.getExcuteRate())); //TODO Mark
-                List<Logic> logicList = Lists.newArrayList();
-                logicList.add(node1);
-                logicList.add(node2);
-                and.setLogicList(logicList);
-                ((Interation) logic).setLogic(and);
-            } else {
-                List<Logic> logicList = l.getLogicList();
-                and(logicList);
-            }
+//            Logic l = ((Interation) logic).getLogic();
+//            if (l instanceof Node) {
+//                And and = new And();
+//                Node node1 = (Node) l;
+//                Node node2 = new Node(new Activity(l.getExcuteRate())); //TODO Mark
+//                List<Logic> logicList = Lists.newArrayList();
+//                logicList.add(node1);
+//                logicList.add(node2);
+//                and.setLogicList(logicList);
+//                ((Interation) logic).setLogic(and);
+//            } else {
+//                List<Logic> logicList = l.getLogicList();
+//                and(logicList);
+//            }
         } else if (logic instanceof Node) {
             And and = new And();
             Node node1 = (Node) logic;
@@ -237,30 +240,30 @@ public class Process {
             List<Logic> logicList = logic.getLogicList();
             or(logicList);
         } else if (logic instanceof And) {
-            List<Logic> logicList = logic.getLogicList();
-            or(logicList);
+//            List<Logic> logicList = logic.getLogicList();
+//            or(logicList);
         } else if (logic instanceof Or) {
-            List<Logic> logicList = logic.getLogicList();
-            or(logicList);
+//            List<Logic> logicList = logic.getLogicList();
+//            or(logicList);
         } else if (logic instanceof Interation) {
-            Logic l = ((Interation) logic).getLogic();
-            if (l instanceof Node) {
-                double p1 = random.nextDouble();
-                double p2 = 1 - p1;
-                Or or = new Or();
-                Node node1 = (Node) l;
-                node1.setExcuteRate(p1);
-                node1.getActivity().setExpectation(p1);
-                Node node2 = new Node(new Activity(p2), p2);
-                List<Logic> logicList = Lists.newArrayList();
-                logicList.add(node1);
-                logicList.add(node2);
-                or.setLogicList(logicList);
-                ((Interation) logic).setLogic(or);
-            } else {
-                List<Logic> logicList = l.getLogicList();
-                or(logicList);
-            }
+//            Logic l = ((Interation) logic).getLogic();
+//            if (l instanceof Node) {
+//                double p1 = random.nextDouble();
+//                double p2 = 1 - p1;
+//                Or or = new Or();
+//                Node node1 = (Node) l;
+//                node1.setExcuteRate(p1);
+//                node1.getActivity().setExpectation(p1);
+//                Node node2 = new Node(new Activity(p2), p2);
+//                List<Logic> logicList = Lists.newArrayList();
+//                logicList.add(node1);
+//                logicList.add(node2);
+//                or.setLogicList(logicList);
+//                ((Interation) logic).setLogic(or);
+//            } else {
+//                List<Logic> logicList = l.getLogicList();
+//                or(logicList);
+//            }
         } else if (logic instanceof Node) {
             double p1 = random.nextDouble();
             double p2 = 1 - p1;

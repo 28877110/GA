@@ -1,9 +1,8 @@
 package org.zjgsu;
 
 import org.zjgsu.algorithm.ga.model.Process;
-import org.zjgsu.algorithm.ga.model.logic.Logic;
+import org.zjgsu.algorithm.ga.population.Population;
 
-import java.util.List;
 
 /**
  * Hello world!
@@ -15,6 +14,12 @@ public class App
     {
         Process process = new Process();
         process.generate();
+
+        Population population = Population.init(process);
+
+
+
+
         System.out.println( "Hello World!" );
     }
 }
