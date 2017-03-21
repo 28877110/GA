@@ -1,5 +1,6 @@
 package org.zjgsu.algorithm.ga.fitness;
 
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import org.zjgsu.algorithm.ga.model.Activity;
@@ -7,7 +8,9 @@ import org.zjgsu.algorithm.ga.model.Process;
 import org.zjgsu.algorithm.ga.model.Resource;
 import org.zjgsu.algorithm.ga.population.Chromsome;
 import org.zjgsu.algorithm.ga.population.Population;
+import org.zjgsu.algorithm.ga.utils.Parameter;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -32,11 +35,10 @@ public class Fitness {
             Chromsome chromsome = chromsomeList.get(i);
             Integer[] resourceNum = chromsome.getResourceNum();
             Double[][] resourceAllocation = chromsome.getResourceAllocation();
-            Double[] p = new Double[activityList.size()];
+            List<Double> p = Lists.newArrayList();
             for (int j = 0; j < activityList.size(); j++) {
                 Double total = 0d;
                 for (int k = 0; k < resourceList.size(); k++) {
-                    Resource resource = resourceList.get(k);
                     Double denominator = 0d;
                     for (int l = 0; l < activityList.size(); l++) {
                         Integer dealTime = resourceActivityDealTime[l][k];
@@ -50,10 +52,27 @@ public class Fitness {
                     Double result = molecular / denominator;
                     total += result;
                 }
-                p[j] = total;
+                p.add(total);
             }
 
-            //TODO 计算p中的最小值作为适应度
+            //TODO 计算minP中的最小值p > φ的情况下，资源数量对应的成本作为适应度
+            Double minP = Collections.min(p);
+            Integer total = Integer.MAX_VALUE;
+            if (minP > Parameter.φ) {
+                total = 0;
+                Integer[] rn = chromsome.getResourceNum();
+                for (int j = 0; j < rn.length; j++) {
+                    Integer cost = rn[j] * resourceList.get(j).getCost();
+                    total += cost;
+                }
+            }
+            chromsome.setFitness(total);
+
+            if (null == population.getBest()) {
+                population.setBest(chromsome);
+            } else if (chromsome.getFitness() < population.getBest().getFitness()) {
+                population.setBest(chromsome);
+            }
         }
     }
 

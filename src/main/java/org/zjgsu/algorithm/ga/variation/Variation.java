@@ -2,6 +2,7 @@ package org.zjgsu.algorithm.ga.variation;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.zjgsu.algorithm.ga.population.Population;
 
 /**
  * 变异
@@ -10,4 +11,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Variation {
+
+    public static void variation(Population population) {
+
+    }
+
 }

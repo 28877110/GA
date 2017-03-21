@@ -7,6 +7,8 @@ public class Parameter {
 
     public static Integer POPULATION_SIZE = 20;
 
+    public static Integer MAX_ITERATIONS = 1000;
+
     //分别表示嵌套生成时是顺序、循环、并发和选择基本结构的概率, 4者之和为1
     public static double P_SEQUENCE = 0.3;
     public static double P_INTERATION = 0.1;
@@ -29,5 +31,7 @@ public class Parameter {
 
     public static int max_cost = 40;
     public static int max_deal_time = 20;
+
+    public static double φ = 0.5;
 
 }
