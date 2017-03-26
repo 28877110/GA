@@ -29,7 +29,7 @@ public class Parameter {
     public static int resource_num = 10;
 
 
-    public static int max_cost = 40;
+    public static int max_count = 40;
     public static int max_deal_time = 20;
 
     public static double φ = 0.5;

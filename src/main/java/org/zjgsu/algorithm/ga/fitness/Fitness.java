@@ -1,6 +1,8 @@
 package org.zjgsu.algorithm.ga.fitness;
 
 import com.google.common.collect.Lists;
+import com.mathworks.toolbox.javabuilder.MWException;
+import fmincon.Class1;
 import lombok.Getter;
 import lombok.Setter;
 import org.zjgsu.algorithm.ga.model.Activity;
@@ -25,7 +27,7 @@ public class Fitness {
      * 计算适应度函数
      * @param population
      */
-    public static void compute(Population population) {
+    public static void compute(Population population) throws MWException {
         Process process = population.getProcess();
         List<Resource> resourceList = process.getResourceList();
         List<Activity> activityList = process.getActivityList();
@@ -34,7 +36,16 @@ public class Fitness {
         for (int i = 0; i < chromsomeList.size(); i++) {
             Chromsome chromsome = chromsomeList.get(i);
             Integer[] resourceNum = chromsome.getResourceNum();
+
+            //TODO 调用fmincon
             Double[][] resourceAllocation = chromsome.getResourceAllocation();
+            String funStr = chromsome.getFunStr(process);
+            Integer[] initCostResourceAllocationRate = process.getInitCostResourceAllocationRate();
+
+            Class1 fmincon = new Class1();
+            fmincon.myfmincon(4, funStr, initCostResourceAllocationRate);
+
+
             List<Double> p = Lists.newArrayList();
             for (int j = 0; j < activityList.size(); j++) {
                 Double total = 0d;
@@ -62,8 +73,8 @@ public class Fitness {
                 total = 0;
                 Integer[] rn = chromsome.getResourceNum();
                 for (int j = 0; j < rn.length; j++) {
-                    Integer cost = rn[j] * resourceList.get(j).getCost();
-                    total += cost;
+                    Integer count = rn[j] * resourceList.get(j).getCount();
+                    total += count;
                 }
             }
             chromsome.setFitness(total);

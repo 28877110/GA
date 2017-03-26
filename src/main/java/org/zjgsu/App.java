@@ -1,5 +1,6 @@
 package org.zjgsu;
 
+import com.mathworks.toolbox.javabuilder.MWException;
 import org.zjgsu.algorithm.ga.cross.Cross;
 import org.zjgsu.algorithm.ga.fitness.Fitness;
 import org.zjgsu.algorithm.ga.model.Process;
@@ -14,8 +15,7 @@ import org.zjgsu.algorithm.ga.variation.Variation;
  */
 public class App 
 {
-    public static void main( String[] args )
-    {
+    public static void main( String[] args ) throws MWException {
         Process process = new Process();
         process.generate();
 

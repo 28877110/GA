@@ -20,13 +20,16 @@ public class Process {
     //节点列表
     private List<Logic> process;
 
-    private List<Activity> activityList = Activity.getList();
+    private List<Activity> activityList;
 
     //资源列表
     private List<Resource> resourceList;
 
     //资源与活动之间的关系及处理时间均值
     private Integer[][] resourceActivityDealTime;
+
+    //面向成本的初始化任务分配率
+    private Integer[] initCostResourceAllocationRate;
 
     /**
      * 生成业务过程实例
@@ -93,9 +96,33 @@ public class Process {
             }
             Collections.shuffle(list);
             for (int j = 0; j < Resource.getNum(); j++) {
-                resourceActivityDealTime[i][j] = list.get(j);
+                resourceActivityDealTime[j][i] = list.get(j);
             }
         }
+
+        //面向成本的初始化任务分配率
+        initCostResourceAllocationRate = new Integer[Activity.getNum() * Resource.getNum()];
+        for (int i = 0; i < Activity.getNum(); i++) {
+            int index = -1;
+            int dealTime = Integer.MAX_VALUE;
+            for (int j = 0; j < Resource.getNum(); j++) {
+                if (null != resourceActivityDealTime[j][i] && resourceActivityDealTime[j][i] < dealTime) {
+                    dealTime = resourceActivityDealTime[j][i];
+                    index = j;
+                }
+            }
+            int position = 0;
+            for (int j = 0; j < Resource.getNum(); j++) {
+                if (index == j) {
+                    initCostResourceAllocationRate[position + i] = 1;
+                } else {
+                    initCostResourceAllocationRate[position + i] = 0;
+                }
+                position += Resource.getNum();
+            }
+        }
+
+        activityList = Activity.getList();
     }
 
     /**
