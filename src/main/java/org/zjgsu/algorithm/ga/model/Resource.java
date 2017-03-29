@@ -16,14 +16,14 @@ public class Resource {
     //当前资源Id
     private Integer id;
 
-    private Integer count;
+    private Integer countLimit;
 
     private static Integer num = 0;
 
     public Resource() {
         Random random = new Random();
         this.id = num++;
-        this.count = random.nextInt(Parameter.max_count);
+        this.countLimit = random.nextInt(Parameter.max_count);
     }
 
     public static Integer getNum() {

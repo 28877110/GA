@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.zjgsu.algorithm.ga.model.logic.*;
 import org.zjgsu.algorithm.ga.utils.Parameter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -29,7 +30,7 @@ public class Process {
     private Integer[][] resourceActivityDealTime;
 
     //面向成本的初始化任务分配率
-    private Integer[] initCostResourceAllocationRate;
+    private Double[] initCostResourceAllocationRate;
 
     /**
      * 生成业务过程实例
@@ -70,7 +71,7 @@ public class Process {
             resourceList.add(resource);
         }
         //初始化资源与活动之间处理时间
-        resourceActivityDealTime = new Integer[Activity.getNum()][Resource.getNum()];
+        resourceActivityDealTime = new Integer[Resource.getNum()][Activity.getNum()];
         for (int i = 0; i < Activity.getNum(); i++) {
             List<Integer> list = Lists.newArrayList();
             for (int j = 0; j < Resource.getNum(); j++) {
@@ -99,30 +100,39 @@ public class Process {
                 resourceActivityDealTime[j][i] = list.get(j);
             }
         }
+        activityList = Activity.getList();
 
         //面向成本的初始化任务分配率
-        initCostResourceAllocationRate = new Integer[Activity.getNum() * Resource.getNum()];
+        List<Double> initCostResourceAllocationRate = new ArrayList<>(activityList.size() * resourceList.size());
+        for (int i = 0; i < activityList.size() * resourceList.size(); i++) {
+            initCostResourceAllocationRate.add(null);
+        }
+
         for (int i = 0; i < Activity.getNum(); i++) {
             int index = -1;
             int dealTime = Integer.MAX_VALUE;
             for (int j = 0; j < Resource.getNum(); j++) {
-                if (null != resourceActivityDealTime[j][i] && resourceActivityDealTime[j][i] < dealTime) {
-                    dealTime = resourceActivityDealTime[j][i];
-                    index = j;
+                if (null != resourceActivityDealTime[j][i]) {
+                    if (resourceActivityDealTime[j][i] < dealTime) {
+                        dealTime = resourceActivityDealTime[j][i];
+                        index = j;
+                    }
+                } else {
+                    initCostResourceAllocationRate.set(i + j * activityList.size(), null);
                 }
             }
-            int position = 0;
             for (int j = 0; j < Resource.getNum(); j++) {
                 if (index == j) {
-                    initCostResourceAllocationRate[position + i] = 1;
+                    initCostResourceAllocationRate.set(i + j * activityList.size(), 1d);
+                } else if (null == resourceActivityDealTime[j][i]) {
+                    initCostResourceAllocationRate.set(i + j * activityList.size(), null);
                 } else {
-                    initCostResourceAllocationRate[position + i] = 0;
+                    initCostResourceAllocationRate.set(i + j * activityList.size(), 0d);
                 }
-                position += Resource.getNum();
             }
         }
-
-        activityList = Activity.getList();
+        initCostResourceAllocationRate.removeAll(Collections.singleton(null));
+        this.initCostResourceAllocationRate = initCostResourceAllocationRate.toArray(new Double[]{});
     }
 
     /**

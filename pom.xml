@@ -43,11 +43,19 @@
     </dependency>
 
     <dependency>
-      <groupId>fmincon</groupId>
-      <artifactId>fmincon</artifactId>
+      <groupId>fminimax</groupId>
+      <artifactId>fminimax</artifactId>
       <version>1.0</version>
       <scope>system</scope>
-      <systemPath>${project.basedir}/lib/fmincon.jar</systemPath>
+      <systemPath>${project.basedir}/lib/fminimax.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>add</groupId>
+      <artifactId>add</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/add.jar</systemPath>
     </dependency>
 
     <dependency>

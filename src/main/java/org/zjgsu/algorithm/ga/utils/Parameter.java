@@ -24,9 +24,9 @@ public class Parameter {
     public static double n = 1;
 
     //活动数量
-    public static int activity_num = 10;
+    public static int activity_num = 5;
     //资源数量
-    public static int resource_num = 10;
+    public static int resource_num = 3;
 
 
     public static int max_count = 40;

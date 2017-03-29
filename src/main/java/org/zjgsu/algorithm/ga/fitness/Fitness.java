@@ -2,7 +2,8 @@ package org.zjgsu.algorithm.ga.fitness;
 
 import com.google.common.collect.Lists;
 import com.mathworks.toolbox.javabuilder.MWException;
-import fmincon.Class1;
+import com.mathworks.toolbox.javabuilder.MWNumericArray;
+import fminimax.Class1;
 import lombok.Getter;
 import lombok.Setter;
 import org.zjgsu.algorithm.ga.model.Activity;
@@ -14,6 +15,7 @@ import org.zjgsu.algorithm.ga.utils.Parameter;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 适应度
@@ -27,7 +29,7 @@ public class Fitness {
      * 计算适应度函数
      * @param population
      */
-    public static void compute(Population population) throws MWException {
+    public static void compute(Population population, Class1 fminimax) throws MWException {
         Process process = population.getProcess();
         List<Resource> resourceList = process.getResourceList();
         List<Activity> activityList = process.getActivityList();
@@ -35,16 +37,37 @@ public class Fitness {
         List<Chromsome> chromsomeList = population.getChromsomeList();
         for (int i = 0; i < chromsomeList.size(); i++) {
             Chromsome chromsome = chromsomeList.get(i);
-            Integer[] resourceNum = chromsome.getResourceNum();
+            Map<Integer, Integer> xValue = chromsome.getXValue();
+            Integer[] resourceCount = chromsome.getResourceCount();
 
             //TODO 调用fmincon
             Double[][] resourceAllocation = chromsome.getResourceAllocation();
-            String funStr = chromsome.getFunStr(process);
-            Integer[] initCostResourceAllocationRate = process.getInitCostResourceAllocationRate();
+            String funStr = chromsome.getFunStr();
+            Double[] x0 = process.getInitCostResourceAllocationRate();
+            Double[][] aeq = chromsome.getAeq();
+            Double[] beq = chromsome.getBeq();
+            Double[] lb = chromsome.getLb();
+            Double[] ub = chromsome.getUb();
 
-            Class1 fmincon = new Class1();
-            fmincon.myfmincon(4, funStr, initCostResourceAllocationRate);
+            Object[] resultArray = fminimax.myfminimax(4, funStr, x0, aeq, beq, lb, ub);
+            MWNumericArray result0 = (MWNumericArray)resultArray[0];
+            MWNumericArray result2 = (MWNumericArray)resultArray[2];
+            double[] matlabAllocationRate = result0.getDoubleData();
+            double maxCapacity = -result2.getDouble();
 
+            //将fminimax得到的resourceAllocationRate赋值给chromsome中的resourceAllocation
+            for (int j = 0; j < resourceAllocation.length; j++) {
+                for (int k = 0; k < resourceAllocation[j].length; k++) {
+                    if (null != resourceAllocation[j][k]) {
+                        Integer index = xValue.get(j * activityList.size() + k);
+                        if (null != index) {
+                            resourceAllocation[j][k] = matlabAllocationRate[index - 1];
+                        } else {
+                            resourceAllocation[j][k] = 0d;
+                        }
+                    }
+                }
+            }
 
             List<Double> p = Lists.newArrayList();
             for (int j = 0; j < activityList.size(); j++) {
@@ -52,14 +75,17 @@ public class Fitness {
                 for (int k = 0; k < resourceList.size(); k++) {
                     Double denominator = 0d;
                     for (int l = 0; l < activityList.size(); l++) {
-                        Integer dealTime = resourceActivityDealTime[l][k];
-                        Double allocRate = resourceAllocation[l][k];
+                        Integer dealTime = resourceActivityDealTime[k][l];
+                        if (null == dealTime) {
+                            dealTime = 0;
+                        }
+                        Double allocRate = resourceAllocation[k][l];
                         Double expect = activityList.get(l).getExpectation();
-                        denominator += dealTime * allocRate * expect;
+                        denominator += Double.valueOf(dealTime) * allocRate * expect;
                     }
 
-                    Double allocationRate = resourceAllocation[j][k];
-                    Double molecular = resourceNum[k] * allocationRate;
+                    Double allocationRate = resourceAllocation[k][j];
+                    Double molecular = Double.valueOf(resourceCount[k]) * allocationRate;
                     Double result = molecular / denominator;
                     total += result;
                 }
@@ -71,9 +97,9 @@ public class Fitness {
             Integer total = Integer.MAX_VALUE;
             if (minP > Parameter.φ) {
                 total = 0;
-                Integer[] rn = chromsome.getResourceNum();
+                Integer[] rn = chromsome.getResourceCount();
                 for (int j = 0; j < rn.length; j++) {
-                    Integer count = rn[j] * resourceList.get(j).getCount();
+                    Integer count = rn[j] * resourceCount[j];
                     total += count;
                 }
             }
