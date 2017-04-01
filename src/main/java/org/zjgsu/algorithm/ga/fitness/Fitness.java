@@ -6,6 +6,7 @@ import com.mathworks.toolbox.javabuilder.MWNumericArray;
 import fminimax.Class1;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.beanutils.BeanUtils;
 import org.zjgsu.algorithm.ga.model.Activity;
 import org.zjgsu.algorithm.ga.model.Process;
 import org.zjgsu.algorithm.ga.model.Resource;
@@ -13,6 +14,7 @@ import org.zjgsu.algorithm.ga.population.Chromsome;
 import org.zjgsu.algorithm.ga.population.Population;
 import org.zjgsu.algorithm.ga.utils.Parameter;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,11 +27,17 @@ import java.util.Map;
 @Setter
 public class Fitness {
 
+    public static Chromsome best;
+
+    public static Integer bestCost;
+
     /**
      * 计算适应度函数
      * @param population
      */
-    public static void compute(Population population, Class1 fminimax) throws MWException {
+    public static void compute(Population population, Class1 fminimax)
+        throws MWException, InvocationTargetException, NoSuchMethodException, InstantiationException,
+        IllegalAccessException {
         Process process = population.getProcess();
         List<Resource> resourceList = process.getResourceList();
         List<Activity> activityList = process.getActivityList();
@@ -97,18 +105,32 @@ public class Fitness {
             Integer total = Integer.MAX_VALUE;
             if (minP > Parameter.φ) {
                 total = 0;
-                Integer[] rn = chromsome.getResourceCount();
-                for (int j = 0; j < rn.length; j++) {
-                    Integer count = rn[j] * resourceCount[j];
+                List<Resource> rList = process.getResourceList();
+                for (int j = 0; j < rList.size(); j++) {
+                    Integer count = rList.get(j).getCost() * resourceCount[j];
                     total += count;
                 }
             }
             chromsome.setFitness(total);
 
-            if (null == population.getBest()) {
-                population.setBest(chromsome);
-            } else if (chromsome.getFitness() < population.getBest().getFitness()) {
-                population.setBest(chromsome);
+            if (null == Fitness.best) {
+                Fitness.best = chromsome;
+                List<Resource> rList = process.getResourceList();
+                Integer[] rCount = best.getResourceCount();
+                Integer temp = 0;
+                for (int j = 0; j < rList.size(); j++) {
+                    temp += rList.get(j).getCost() * rCount[j];
+                }
+                Fitness.bestCost = temp;
+            } else if (chromsome.getFitness() < Fitness.best.getFitness()) {
+                Fitness.best = (Chromsome) BeanUtils.cloneBean(chromsome);
+                List<Resource> rList = process.getResourceList();
+                Integer[] rCount = best.getResourceCount();
+                Integer temp = 0;
+                for (int j = 0; j < rList.size(); j++) {
+                    temp += rList.get(j).getCost() * rCount[j];
+                }
+                Fitness.bestCost = temp;
             }
         }
     }

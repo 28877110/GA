@@ -18,8 +18,6 @@ public class Population {
 
     private List<Chromsome> chromsomeList = Lists.newArrayList();
 
-    private Chromsome best;
-
     private Process process;
 
     public static Population init(Process process) {

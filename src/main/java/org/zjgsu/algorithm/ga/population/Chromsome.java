@@ -1,5 +1,6 @@
 package org.zjgsu.algorithm.ga.population;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +19,7 @@ import org.zjgsu.algorithm.ga.model.Resource;
  */
 @Getter
 @Setter
-public class Chromsome {
+public class Chromsome implements Serializable {
 
     //资源数量
     private Integer[] resourceCount;
@@ -39,6 +40,10 @@ public class Chromsome {
     private Double[] ub;
 
     Map<Integer, Integer> xValue = Maps.newHashMap();
+
+    public Chromsome() {
+
+    }
 
     public Chromsome(Process process) {
         List<Resource> resourceList =process.getResourceList();

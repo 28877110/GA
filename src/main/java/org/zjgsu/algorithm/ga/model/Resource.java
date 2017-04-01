@@ -18,12 +18,15 @@ public class Resource {
 
     private Integer countLimit;
 
+    private Integer cost;
+
     private static Integer num = 0;
 
     public Resource() {
         Random random = new Random();
         this.id = num++;
-        this.countLimit = random.nextInt(Parameter.max_count);
+        this.countLimit = random.nextInt(Parameter.max_count) + 1;
+        this.cost = Parameter.getMaxCost();
     }
 
     public static Integer getNum() {
