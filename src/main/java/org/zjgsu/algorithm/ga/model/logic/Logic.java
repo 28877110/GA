@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.zjgsu.algorithm.ga.enums.LogicEnum;
 import org.zjgsu.algorithm.ga.model.Activity;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public abstract class Logic {
+public abstract class Logic implements Serializable {
 
     private List<Logic> logicList;
 

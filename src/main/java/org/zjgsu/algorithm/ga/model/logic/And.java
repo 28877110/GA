@@ -19,4 +19,9 @@ public class And extends Logic {
         this.setLogicEnum(LogicEnum.And);
     }
 
+    public And(double excuteRate) {
+        this.excuteRate = excuteRate;
+        this.setLogicEnum(LogicEnum.And);
+    }
+
 }

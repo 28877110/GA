@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
-public class Activity {
+public class Activity implements Serializable {
 
     //当前节点Id
     private Integer id;
@@ -40,6 +41,12 @@ public class Activity {
 
     public static Integer getNum() {
         return num;
+    }
+
+    public static void reset() {
+        idToActivity = Maps.newHashMap();
+        list = Lists.newArrayList();
+        num = 0;
     }
 
     public static List<Activity> getList() {

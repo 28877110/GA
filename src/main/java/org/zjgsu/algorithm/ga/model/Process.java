@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.zjgsu.algorithm.ga.model.logic.*;
 import org.zjgsu.algorithm.ga.utils.Parameter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.Random;
  */
 @Getter
 @Setter
-public class Process {
+public class Process implements Serializable {
 
     //节点列表
     private List<Logic> process;
@@ -34,11 +35,14 @@ public class Process {
     //面向成本的初始化任务分配率
     private Double[] initCostResourceAllocationRate;
 
-
     /**
      * 生成业务过程实例
       */
-    public void generate() {
+    public void generate(Integer activityNum) {
+
+        if (activityNum == null || activityNum <= 0) {
+            activityNum = Parameter.ACTIVITY_NUM;
+        }
 
         process = Lists.newArrayList();
         resourceList = Lists.newArrayList();
@@ -56,7 +60,7 @@ public class Process {
         Random random = new Random();
 
         //生成过程实例
-        while (Activity.getNum() < Parameter.ACTIVITY_NUM) {
+        while (Activity.getNum() < activityNum) {
             double pSequence = Parameter.P_SEQUENCE;
             double pInteration = pSequence + Parameter.P_INTERATION;
             double pAnd = pInteration + Parameter.P_AND;
@@ -92,15 +96,8 @@ public class Process {
              * 资源数>2时，资源可处理活动数 > 2, <资源数-1
              * 资源数=2时，资源可处理活动数 > 0, <=2
              */
-            Integer num;
-            if (Resource.getNum() > 2) {
-                num = 2 + random.nextInt(Resource.getNum() - 2);
-            } else if (Resource.getNum() == 2) {
-                num = random.nextInt(2) + 1;
-            } else {
-                num = Resource.getNum();
-            }
-            Integer cantDeal = Resource.getNum() - num;
+            Integer num = Parameter.alternativeResourcesForActivityNum();
+            int cantDeal = Resource.getNum() - num;
             for (int j = 0; j < cantDeal; j++) {
                 list.set(j, null);
             }
@@ -142,6 +139,17 @@ public class Process {
         }
         initCostResourceAllocationRate.removeAll(Collections.singleton(null));
         this.initCostResourceAllocationRate = initCostResourceAllocationRate.toArray(new Double[]{});
+
+        for (int i = 0; i < resourceList.size(); i++) {
+            double n = 0d;
+            for (int j = 0; j < activityList.size(); j++) {
+                if (resourceActivityDealTime[i][j] != null) {
+                    n += resourceActivityDealTime[i][j] * activityList.get(j).getExpectation();
+                }
+            }
+            n = n * Parameter.getMaxAbility();
+            resourceList.get(i).setCountLimit((int) Math.ceil(n));
+        }
     }
 
     /**

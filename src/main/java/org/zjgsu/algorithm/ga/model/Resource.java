@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.zjgsu.algorithm.ga.utils.Parameter;
 
+import java.io.Serializable;
 import java.util.Random;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Random;
  */
 @Getter
 @Setter
-public class Resource {
+public class Resource implements Serializable {
 
     //当前资源Id
     private Integer id;
@@ -31,5 +32,9 @@ public class Resource {
 
     public static Integer getNum() {
         return num;
+    }
+
+    public static void reset() {
+        num = 0;
     }
 }

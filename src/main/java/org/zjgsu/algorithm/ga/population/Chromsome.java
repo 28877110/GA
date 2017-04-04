@@ -13,6 +13,7 @@ import lombok.Setter;
 import org.zjgsu.algorithm.ga.model.Activity;
 import org.zjgsu.algorithm.ga.model.Process;
 import org.zjgsu.algorithm.ga.model.Resource;
+import org.zjgsu.algorithm.ga.utils.Parameter;
 
 /**
  * Created by wuhanqing on 2017/3/19.
@@ -27,7 +28,11 @@ public class Chromsome implements Serializable {
     //资源配置
     private Double[][] resourceAllocation;
 
+    //question1
     private Integer fitness;
+
+    //question2
+    private Double fitness2;
 
     private String funStr;
 
@@ -46,16 +51,18 @@ public class Chromsome implements Serializable {
     }
 
     public Chromsome(Process process) {
-        List<Resource> resourceList =process.getResourceList();
+        List<Resource> resourceList = process.getResourceList();
+        List<Activity> activityList = process.getActivityList();
+        Integer[][] resourceActivityDealTime = process.getResourceActivityDealTime();
         Integer resourceSize = resourceList.size();
+        Integer activitySize = activityList.size();
         resourceCount = new Integer[resourceSize];
-        resourceAllocation = new Double[resourceSize][Activity.getNum()];
+        resourceAllocation = new Double[resourceSize][activitySize];
 
-        for (int i = 0; i < Activity.getNum(); i++) {
+        for (int i = 0; i < activitySize; i++) {
             //面向成本的资源分配方案
             Integer minDealTime = Integer.MAX_VALUE;
             Integer index = null;
-            Integer[][] resourceActivityDealTime = process.getResourceActivityDealTime();
             for (int j = 0; j < resourceSize; j++) {
                 Integer dealTime = resourceActivityDealTime[j][i];
                 if (null != dealTime && dealTime < minDealTime && dealTime > 0) {
@@ -64,7 +71,7 @@ public class Chromsome implements Serializable {
                 }
             }
             for (int j = 0; j < resourceSize; j++) {
-                if (j == index) {
+                if (index != null && j == index) {
                     resourceAllocation[j][i] = 1d;
                 } else {
                     resourceAllocation[j][i] = 0d;
@@ -73,10 +80,52 @@ public class Chromsome implements Serializable {
         }
 
         Random random = new Random();
-        for (int i = 0; i < resourceSize; i++) {
-            Integer limit = resourceList.get(i).getCountLimit();
-            resourceCount[i] = random.nextInt(limit) + 1;
-            //resourceCount[i] = 6;
+        for (int i = 0; i < resourceList.size(); i++) {
+            double n = 0d;
+            for (int j = 0; j < activityList.size(); j++) {
+                if (resourceActivityDealTime[i][j] != null) {
+                    n += resourceActivityDealTime[i][j] * activityList.get(j).getExpectation();
+                }
+            }
+            n = n * Parameter.getMaxAbility();
+            resourceList.get(i).setCountLimit((int) Math.ceil(n));
+            resourceCount[i] = random.nextInt(resourceList.get(i).getCountLimit()) + 1;
+        }
+
+        this.funStr = getFunStr(process);
+        this.aeq = getAeq(process);
+        this.beq = getBeq(process);
+        this.lb = getLb(process);
+        this.ub = getUb(process);
+    }
+
+    public Chromsome(Process process, Integer[] rc) {
+        List<Resource> resourceList = process.getResourceList();
+        List<Activity> activityList = process.getActivityList();
+        Integer[][] resourceActivityDealTime = process.getResourceActivityDealTime();
+        Integer resourceSize = resourceList.size();
+        Integer activitySize = activityList.size();
+        resourceCount = rc;
+        resourceAllocation = new Double[resourceSize][activitySize];
+
+        for (int i = 0; i < activitySize; i++) {
+            //面向成本的资源分配方案
+            Integer minDealTime = Integer.MAX_VALUE;
+            Integer index = null;
+            for (int j = 0; j < resourceSize; j++) {
+                Integer dealTime = resourceActivityDealTime[j][i];
+                if (null != dealTime && dealTime < minDealTime && dealTime > 0) {
+                    minDealTime = dealTime;
+                    index = j;
+                }
+            }
+            for (int j = 0; j < resourceSize; j++) {
+                if (index != null && j == index) {
+                    resourceAllocation[j][i] = 1d;
+                } else {
+                    resourceAllocation[j][i] = 0d;
+                }
+            }
         }
 
         this.funStr = getFunStr(process);

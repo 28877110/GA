@@ -18,9 +18,13 @@ public class Node extends Logic {
 
     public Node(Activity activity, Logic father) {
         this.activity = activity;
-        this.excuteRate = 1.0;
+        if (activity.getExpectation() == null) {
+            this.excuteRate = 1.0;
+            activity.setExpectation(1.0);
+        } else {
+            this.excuteRate = activity.getExpectation();
+        }
         this.father = father;
-        activity.setExpectation(1.0);
         this.setLogicEnum(LogicEnum.Node);
     }
 

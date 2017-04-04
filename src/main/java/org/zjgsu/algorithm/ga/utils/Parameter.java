@@ -10,12 +10,17 @@ import com.google.common.collect.Lists;
  */
 public class Parameter {
 
-    public static Integer POPULATION_SIZE = 20;
+    public static Integer POPULATION_SIZE = 40;
 
-    public static Double VARIATION_PROB = 0.05;
+    public static Integer MAX_ATTEMPT_TIME = 1500;
+
+    public static Double VARIATION_PROB = 0.4;
     public static Double CROSS_PROB = 0.7;
+    public static Double BIASES = 0.7;
+    public static Double MIGRANT = 0.1;
 
-    public static Integer MAX_ITERATIONS = 1000;
+//    public static Integer MAX_ITERATIONS = 20 * 5000 / POPULATION_SIZE; // MAX_ITERATIONS * POPULATION_SIZE
+    public static Integer MAX_ITERATIONS = 9000; // MAX_ITERATIONS * POPULATION_SIZE
 
     //均匀分布上下限参数
     public static double α = 1;
@@ -26,7 +31,7 @@ public class Parameter {
     public static double n = 1;
 
     //活动数量
-    public static int ACTIVITY_NUM = 5;
+    public static int ACTIVITY_NUM = 10;
     //资源数量
     //public static int resource_num = 3;
 
@@ -34,6 +39,8 @@ public class Parameter {
     public static int max_count = 40;
 
     public static Double φ;
+
+    public static Integer LIMIT_COST;
 
     //分别表示嵌套生成时是顺序、循环、并发和选择基本结构的概率, 4者之和为1
     //Parameter1
@@ -65,7 +72,7 @@ public class Parameter {
 
     //活动可供选择的资源数Parameter6
     public static int alternativeResourcesForActivityNum() {
-        Integer num = binomialDistribution(4, 0.2);
+        Integer num = binomialDistribution(2, 0.2);
         if (num == 0) { //(不为0的二项分布随机整数)
             num = alternativeResourcesForActivityNum();
         }
@@ -92,12 +99,25 @@ public class Parameter {
         return random.nextInt(60) + 10; //10 - 70的均匀分布
     }
 
+    //成本参数范围Parameter11
     public static double getMaxAbility() {
         if (φ == null) {
             Random random = new Random();
-            φ = random.nextDouble() * (20 / 8) + (5 / 8); // 5/8 - 25/8的均匀分布
+//            φ = random.nextDouble() * (20 / 8) + (5 / 8); // 5/8 - 25/8的均匀分布
+            φ = random.nextDouble() + 0.5; // 0.5 + 1.5的均匀分布
         }
+//        return φ;
         return φ;
+    }
+
+    //成本参数范围Parameter12
+    public static double getUpperCost() {
+        if (LIMIT_COST == null) {
+            Random random = new Random();
+//            φ = random.nextDouble() * (20 / 8) + (5 / 8); // 5/8 - 25/8的均匀分布
+            LIMIT_COST = random.nextInt(800) + 1 + 400; // 0.5 + 1.5的均匀分布
+        }
+        return LIMIT_COST;
     }
 
     //求排列组合数方法

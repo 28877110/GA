@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.zjgsu.algorithm.ga.model.Process;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.zjgsu.algorithm.ga.utils.Parameter.POPULATION_SIZE;
@@ -30,6 +32,30 @@ public class Population {
         for (int i = 0; i < size; i++) {
             chromsomeList.add(new Chromsome(process));
         }
+    }
+
+    public void sort() {
+        Collections.sort(chromsomeList, new Comparator<Chromsome>() {
+            @Override
+            public int compare(Chromsome o1, Chromsome o2) {
+                if (o1.getFitness() != null && o2.getFitness() == null) {
+                    return 1;
+                }
+                if (o1.getFitness() == null && o2.getFitness() != null) {
+                    return -1;
+                }
+                if (o1.getFitness() == null && o2.getFitness() == null) {
+                    return 0;
+                }
+                if (o1.getFitness() > o2.getFitness()) {
+                    return 1;
+                } else if (o1.getFitness() < o2.getFitness()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        });
     }
 
 }
